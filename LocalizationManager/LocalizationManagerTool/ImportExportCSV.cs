@@ -37,5 +37,16 @@ namespace LocalizationManagerTool
 
             return content;
         }
+
+        public void ExportCSV(List<string> content, string _path)
+        {
+            using (var writer = new StreamWriter(_path))
+            {
+                foreach (var item in content)
+                {
+                    writer.WriteLine(item);
+                }
+            }
+        }
     }
 }
