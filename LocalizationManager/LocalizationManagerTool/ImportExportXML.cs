@@ -25,7 +25,7 @@ namespace LocalizationManagerTool
             var serializer = new XmlSerializer(typeof(List<ColumnStruct>));
             using (var reader = new StreamReader(filePath))
             {
-                if(serializer != null)
+                if (serializer != null)
                 {
                     object? deserializedContent = serializer.Deserialize(reader);
 
