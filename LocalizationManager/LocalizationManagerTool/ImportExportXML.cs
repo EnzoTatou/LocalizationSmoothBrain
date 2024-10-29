@@ -35,7 +35,8 @@ namespace LocalizationManagerTool
                     }
                 }
             }
-            return new List<ColumnStruct>();
+
+            throw new System.Exception("haha dunkan tu t'es fait avoir");
         }
 
         public void ExportToXML(DataGrid dataGrid, string filePath)
