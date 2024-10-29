@@ -25,7 +25,7 @@ namespace LocalizationManagerTool
             var serializer = new XmlSerializer(typeof(List<ColumnStruct>));
             using (var reader = new StreamReader(filePath))
             {
-                if(serializer != null)
+                if (serializer != null)
                 {
                     object? deserializedContent = serializer.Deserialize(reader);
 
@@ -35,7 +35,8 @@ namespace LocalizationManagerTool
                     }
                 }
             }
-            return new List<ColumnStruct>();
+
+            throw new System.Exception("haha dunkan tu t'es fait avoir");
         }
 
         public void ExportToXML(DataGrid dataGrid, string filePath)
