@@ -1,17 +1,11 @@
 ﻿using Microsoft.Win32;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.IO;
-using System.Text;
+using System.ComponentModel;
+using System.Data;
+using System.Data.Common;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace LocalizationManagerTool
 {
@@ -22,42 +16,87 @@ namespace LocalizationManagerTool
     {
         public List<string> Columns = new List<string>();
         ObservableCollection<Row> row = new ObservableCollection<Row>();
-        
-        class Row
+
+        public class Row : INotifyPropertyChanged
         {
-            public Row(int size)
+            //public Row(int size)
+            //{
+            //    items = new string[size];
+            //}
+
+            //private string[] items;
+            private string id = string.Empty;
+            private string en = string.Empty;
+            private string fr = string.Empty;
+            private string es = string.Empty;
+            private string ja = string.Empty;
+            public string Id
             {
-                items = new string[size];
+                get { return id; }
+                set
+                {
+                    id = value;
+                    OnPropertyChanged(id);
+                }
             }
-            public string[] items;
+            public string En
+            {
+                get { return en; }
+                set
+                {
+                    en = value;
+                    OnPropertyChanged(en);
+                }
+            }
+            public string Fr
+            {
+                get { return fr; }
+                set
+                {
+                    fr = value;
+                    OnPropertyChanged(fr);
+                }
+            }
+            public string Es
+            {
+                get { return es; }
+                set
+                {
+                    es = value;
+                    OnPropertyChanged(es);
+                }
+            }
+            public string Ja
+            {
+                get { return ja; }
+                set
+                {
+                    ja = value;
+                    OnPropertyChanged(ja);
+                }
+            }
+
+            public event PropertyChangedEventHandler? PropertyChanged;
+
+            protected void OnPropertyChanged(string propertyName)
+            {
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            }
         }
+
         public MainWindow()
         {
             InitializeComponent();
-            Columns.Add("id");
-            Columns.Add("en");
-            Columns.Add("fr");
-            Columns.Add("es");
-            Columns.Add("ja");
 
             dataGrid.ItemsSource = row;
-            foreach (string column in Columns)
-            {
-                //Pour ajouter une colonne à notre datagrid
-                DataGridTextColumn textColumn = new DataGridTextColumn();
-                textColumn.Header = column;
-                textColumn.Binding = new Binding(column);
-                dataGrid.Columns.Add(textColumn);
-            }
 
-            
+            Row test = new Row();
+            test.Id = "test";
+            test.En = "en";
+            test.Fr = "fr";
+            test.Es = "es";
+            test.Ja = "ja";
 
-            Row test = new Row(Columns.Count);
-            for (int i = 0; i < Columns.Count; i++)
-            {
-                test.items[i] = i.ToString();
-            }
-            row.Add(test);
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -67,15 +106,20 @@ namespace LocalizationManagerTool
             dialog.FileName = "Import file";
             dialog.Filter = "CSV|*.csv|XML|*.xml|JSON|*.json";
             bool? result = dialog.ShowDialog();
-            if(result == true)
+            if (result == true)
             {
                 string filename = dialog.FileName;
                 string extension = System.IO.Path.GetExtension(filename);
-                switch(extension)
+                MessageBox.Show(extension);
+                switch (extension)
                 {
-                    case "xml":
+                    case ".xml":
                         ImportXML(filename);
                         MessageBox.Show("XML imported");
+                        break;
+                    case ".json":
+                        ImportJSON(filename);
+                        MessageBox.Show("JSON imported");
                         break;
                 }
             }
@@ -83,7 +127,20 @@ namespace LocalizationManagerTool
 
         private void ImportXML(string filename)
         {
-            List<ColumnStruct> xmlFile = ImportFromXML(filename);
+            List<Row> xmlFile = ImportFromXML(filename);
+            foreach (Row xmlRow in xmlFile)
+            {
+                row.Add(xmlRow);
+            }
+        }
+
+        private void ImportJSON(string filename)
+        {
+            List<Row> xmlFile = ImportFromJSON(filename);
+            foreach (Row xmlRow in xmlFile)
+            {
+                row.Add(xmlRow);
+            }
         }
 
         private void Button_Export(object sender, RoutedEventArgs e)
@@ -92,8 +149,8 @@ namespace LocalizationManagerTool
             bool? result = dialog.ShowDialog();
             if (result == true)
             {
-                string folderName = dialog.FolderName + "/test.xml";
-                ExportToXML(dataGrid, folderName);
+                string folderName = dialog.FolderName + "/test.json";
+                ExportToJSON(dataGrid, folderName);
             }
         }
     }

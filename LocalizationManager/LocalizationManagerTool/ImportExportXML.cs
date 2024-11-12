@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
+﻿using System.Data;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Controls;
-using System.Xml;
 using System.Xml.Serialization;
 
 namespace LocalizationManagerTool
@@ -20,9 +13,9 @@ namespace LocalizationManagerTool
 
     public partial class MainWindow
     {
-        public List<ColumnStruct> ImportFromXML(string filePath)
+        public List<Row> ImportFromXML(string filePath)
         {
-            var serializer = new XmlSerializer(typeof(List<ColumnStruct>));
+            var serializer = new XmlSerializer(typeof(List<Row>));
             using (var reader = new StreamReader(filePath))
             {
                 if (serializer != null)
@@ -31,7 +24,7 @@ namespace LocalizationManagerTool
 
                     if (deserializedContent != null)
                     {
-                        return (List<ColumnStruct>)deserializedContent;
+                        return (List<Row>)deserializedContent;
                     }
                 }
             }
@@ -41,8 +34,8 @@ namespace LocalizationManagerTool
 
         public void ExportToXML(DataGrid dataGrid, string filePath)
         {
-            var items = dataGrid.Items.Cast<ColumnStruct>().ToList();
-            var serializer = new XmlSerializer(typeof(List<ColumnStruct>));
+            var items = dataGrid.ItemsSource.Cast<Row>().ToList();
+            var serializer = new XmlSerializer(typeof(List<Row>));
             using (var writer = new StreamWriter(filePath))
             {
                 serializer.Serialize(writer, items);
