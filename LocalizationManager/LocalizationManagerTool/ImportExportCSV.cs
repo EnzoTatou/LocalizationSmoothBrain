@@ -1,18 +1,19 @@
 ﻿using System.IO;
+using System.Reflection;
+using System.Text.Json;
+using System.Windows.Controls;
 
 namespace LocalizationManagerTool
 {
     public partial class MainWindow
     {
 
-        public List<string> ImportCSV(string _path)
+        public List<Row> ImportFromCSV(string _path)
         {
-            List<string> content = new();
+            List<Row> content = new();
 
             using (var reader = new StreamReader(_path))
             {
-                List<string> listA = new List<string>();
-                List<string> listB = new List<string>();
                 while (!reader.EndOfStream)
                 {
                     var line = reader.ReadLine();
@@ -20,11 +21,13 @@ namespace LocalizationManagerTool
                     if (line != null)
                     {
                         var values = line.Split(';');
-
-                        foreach (var v in values)
+                        Row row = new Row();
+                        Type rowType = typeof(Row);
+                        for (int i = 0; i < values.Length; i++)
                         {
-                            content.Add(v);
+                            rowType.GetFields()[i].SetValue(row, values[i]);
                         }
+                        content.Add(row);
                     }
                 }
             }
@@ -32,7 +35,7 @@ namespace LocalizationManagerTool
             return content;
         }
 
-        public void ExportCSV(List<string> content, string _path)
+        public void ExportToCSV(List<Row> content, string _path)
         {
             using (var writer = new StreamWriter(_path))
             {

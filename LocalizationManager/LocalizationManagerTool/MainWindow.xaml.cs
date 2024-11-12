@@ -121,6 +121,10 @@ namespace LocalizationManagerTool
                         ImportJSON(filename);
                         MessageBox.Show("JSON imported");
                         break;
+                    case ".csv":
+                        ImportCSV(filename);
+                        MessageBox.Show("CSV imported");
+                        break;
                 }
             }
         }
@@ -143,14 +147,23 @@ namespace LocalizationManagerTool
             }
         }
 
+        private void ImportCSV(string filename)
+        {
+            List<Row> xmlFile = ImportFromCSV(filename);
+            foreach (Row xmlRow in xmlFile)
+            {
+                row.Add(xmlRow);
+            }
+        }
+
         private void Button_Export(object sender, RoutedEventArgs e)
         {
             var dialog = new OpenFolderDialog();
             bool? result = dialog.ShowDialog();
             if (result == true)
             {
-                string folderName = dialog.FolderName + "/test.json";
-                ExportToJSON(dataGrid, folderName);
+                string folderName = dialog.FolderName + "/test.csv";
+                ExportToCSV(row.ToList(), folderName);
             }
         }
     }
