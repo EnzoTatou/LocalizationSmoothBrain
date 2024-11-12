@@ -52,15 +52,14 @@ namespace LocalizationManagerTool
 
                 string toAdd = string.Empty;
 
-                List<string> languages = GetLanguages();
-                MessageBox.Show(languages.Count.ToString());
+                List<FieldInfo> languages = GetLanguages();
 
                 for (int i = 0; i < languages.Count; i++)
                 {
-                    toAdd += "\t\t{ \"" + languages[i] + "\",new Dictionary<string, string> ";
+                    toAdd += "\t\t{ \"" + languages[i].Name + "\",new Dictionary<string, string> ";
                     foreach (var item in rows)
                     {
-                        toAdd += "\n\t\t { \"" + item.Id + "\", \"" + item.Fr + "\" },";
+                        toAdd += "\n\t\t { \"" + item.Id + "\", \"" + languages[i].GetValue(item) + "\" },";
                     }
                     toAdd += "\n\t\t }\n\t },";
                 }
@@ -88,16 +87,16 @@ namespace LocalizationManagerTool
 
         }
 
-        public List<string> GetLanguages()
+        public List<FieldInfo> GetLanguages()
         {
             Type rowType = typeof(Row);
-            List<string> list = new List<string>();
+            List<FieldInfo> list = new List<FieldInfo>();
             foreach (var field in rowType.GetFields(BindingFlags.NonPublic | BindingFlags.Instance))
             {
                 //MessageBox.Show(field.FieldType.ToString());
                 if (field.FieldType == typeof(string) && field.Name != "id")
                 {
-                    list.Add(field.Name);
+                    list.Add(field);
                 }
             }
             return list;
