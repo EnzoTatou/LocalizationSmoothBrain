@@ -8,32 +8,6 @@ namespace LocalizationManagerTool
 {
     public partial class MainWindow
     {
-        struct LocalizationData
-        {
-            LocalizationData(string _ID, string _language, string _localizedValue)
-            {
-                ID = _ID;
-                language = _language;
-                localizedValue = _localizedValue;
-            }
-
-            public string ID { get; set; }
-            public string language { get; set; }
-
-            public string localizedValue { get; set; }
-        }
-
-        private static Dictionary<string, Dictionary<string, string>> localizerDictionaries = new Dictionary<string, Dictionary<string, string>>()
-        {
-            { "en", new Dictionary<string, string>
-                {
-                    { "hello", "Hello" },
-                    { "goodbye", "Goodbye" },
-                    { "welcome", "Welcome" }
-                }
-            },
-        };
-
         public void ExportCS(DataGrid dataGrid, string filePath)
         {
             using (var reader = new StreamReader(@"..\..\..\..\CSModel.cs"))
