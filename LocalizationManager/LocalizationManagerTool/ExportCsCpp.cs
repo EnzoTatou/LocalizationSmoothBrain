@@ -36,33 +36,35 @@ namespace LocalizationManagerTool
 
         public void ExportCS(DataGrid dataGrid, string filePath)
         {
-            using (var reader = new StreamReader(@"D:\SVN\Eleves\Tools\CSModel.cs"))
+            using (var reader = new StreamReader(@"..\..\..\..\CSModel.cs"))
             {
                 string? result = reader.ReadToEnd();
-                int id = result.IndexOfAny("/**/".ToCharArray());
-                //result = result.Insert(id,
-                //    "\t\t{ \"fr\",new Dictionary<string, string> " +
-                //        "\n\t\t { \"hello\", \"Bonjour\" }, " +
-                //        "\n\t\t { \"play\", \"Jouer\" }, " +
-                //        "\n\t\t { \"settings\", \"Options\" } " +
-                //        "\n\t\t } " +
-                //    "\n\t },");
-                //string toModify = result.Substring(id, 1);
-                //toModify = 
-
+                int id = result.IndexOfAny("/**/".ToCharArray()); 
                 string toAdd = string.Empty;
-
                 List<FieldInfo> languages = GetLanguages();
 
                 for (int i = 0; i < languages.Count; i++)
                 {
-                    toAdd += "\t\t{ \"" + languages[i].Name + "\",new Dictionary<string, string> ";
+                    toAdd += "\t\t{ \"" + languages[i].Name + "\",new Dictionary<string, string>()";
                     foreach (var item in rows)
                     {
-                        toAdd += "\n\t\t { \"" + item.Id + "\", \"" + languages[i].GetValue(item) + "\" },";
+                        toAdd += "\n\t\t\t{ \"" + item.Id + "\", \"" + languages[i].GetValue(item) + "\" }";
+                        if(rows.IndexOf(item) != rows.Count -1)
+                        {
+                            toAdd += ",";
+                        }
                     }
-                    toAdd += "\n\t\t }\n\t },";
+
+                    toAdd += "\n\t\t}";
+
+                    if (i != languages.Count -1)
+                    {
+                        toAdd += ",";
+                    }
+                    toAdd += "\n\n";
                 }
+
+                toAdd += "\n\t }";
 
                 result = result.Insert(id, toAdd);
 
@@ -70,15 +72,6 @@ namespace LocalizationManagerTool
                 {
                     writer.Write(result);
                 }
-
-                //do
-                //{
-                //    result = reader.ReadLine();
-                //    Debug.WriteLine(result);
-                //}
-                //while (result != "/**/");
-                //fs.Seek(reader.Peek() -1, SeekOrigin.Begin);
-                //writer.Write("HAHAHA");
             }
         }
 
