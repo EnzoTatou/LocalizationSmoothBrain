@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Reflection;
 using System.Text.Json;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace LocalizationManagerTool
@@ -20,12 +21,12 @@ namespace LocalizationManagerTool
 
                     if (line != null)
                     {
-                        var values = line.Split(';');
+                        var values = line.Split(',');
                         Row row = new Row();
                         Type rowType = typeof(Row);
                         for (int i = 0; i < values.Length; i++)
                         {
-                            rowType.GetFields()[i].SetValue(row, values[i]);
+                            rowType.GetFields(BindingFlags.NonPublic | BindingFlags.Instance)[i].SetValue(row, values[i]);
                         }
                         content.Add(row);
                     }
