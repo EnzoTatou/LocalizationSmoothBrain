@@ -158,7 +158,7 @@ namespace LocalizationManagerTool
             if (result == true)
             {
                 string folderName = dialog.FolderName + "/test.csv";
-                ExportToCSV(rows.ToList(), folderName);
+                ExportToCSV(dataGrid, folderName);
             }
         }
     }

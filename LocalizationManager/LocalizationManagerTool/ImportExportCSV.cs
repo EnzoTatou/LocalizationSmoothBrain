@@ -1,8 +1,11 @@
-﻿using System.IO;
+﻿using System.Data;
+using System.Diagnostics;
+using System.IO;
 using System.Reflection;
 using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
+using static LocalizationManagerTool.MainWindow;
 
 namespace LocalizationManagerTool
 {
@@ -35,14 +38,24 @@ namespace LocalizationManagerTool
 
             return content;
         }
-
-        public void ExportToCSV(List<Row> content, string _path)
+        
+        public void ExportToCSV(DataGrid dataGrid, string filePath)
         {
-            using (var writer = new StreamWriter(_path))
+            var items = dataGrid.ItemsSource?.Cast<Row>().ToList();
+
+            using (var writer = new StreamWriter(filePath, false))
             {
-                foreach (var item in content)
+                foreach (Row item in items)
                 {
-                    writer.WriteLine(item);
+                    var values = dataGrid.Columns.Select(col =>
+                    {
+                        var cellContent = col.GetCellContent(item);
+                        if (cellContent is TextBlock textBlock)
+                            return textBlock.Text;
+                        return "";
+                    }).ToArray();
+
+                    writer.WriteLine(string.Join(";", values));
                 }
             }
         }
