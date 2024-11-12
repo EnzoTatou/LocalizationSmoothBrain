@@ -1,4 +1,8 @@
-﻿using System.Text;
+﻿using Microsoft.Win32;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.IO;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -17,7 +21,16 @@ namespace LocalizationManagerTool
     public partial class MainWindow : Window
     {
         public List<string> Columns = new List<string>();
-
+        ObservableCollection<Row> row = new ObservableCollection<Row>();
+        
+        class Row
+        {
+            public Row(int size)
+            {
+                items = new string[size];
+            }
+            public string[] items;
+        }
         public MainWindow()
         {
             InitializeComponent();
@@ -27,6 +40,7 @@ namespace LocalizationManagerTool
             Columns.Add("es");
             Columns.Add("ja");
 
+            dataGrid.ItemsSource = row;
             foreach (string column in Columns)
             {
                 //Pour ajouter une colonne à notre datagrid
@@ -35,16 +49,52 @@ namespace LocalizationManagerTool
                 textColumn.Binding = new Binding(column);
                 dataGrid.Columns.Add(textColumn);
             }
+
+            
+
+            Row test = new Row(Columns.Count);
+            for (int i = 0; i < Columns.Count; i++)
+            {
+                test.items[i] = i.ToString();
+            }
+            row.Add(test);
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-
+            //MessageBox.Show("Clicked");
+            var dialog = new OpenFileDialog();
+            dialog.FileName = "Import file";
+            dialog.Filter = "CSV|*.csv|XML|*.xml|JSON|*.json";
+            bool? result = dialog.ShowDialog();
+            if(result == true)
+            {
+                string filename = dialog.FileName;
+                string extension = System.IO.Path.GetExtension(filename);
+                switch(extension)
+                {
+                    case "xml":
+                        ImportXML(filename);
+                        MessageBox.Show("XML imported");
+                        break;
+                }
+            }
         }
 
-        private void Button_Edit(object sender, RoutedEventArgs e)
+        private void ImportXML(string filename)
         {
+            List<ColumnStruct> xmlFile = ImportFromXML(filename);
+        }
 
+        private void Button_Export(object sender, RoutedEventArgs e)
+        {
+            var dialog = new OpenFolderDialog();
+            bool? result = dialog.ShowDialog();
+            if (result == true)
+            {
+                string folderName = dialog.FolderName + "/test.xml";
+                ExportToXML(dataGrid, folderName);
+            }
         }
     }
 }
