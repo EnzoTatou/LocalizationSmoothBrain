@@ -15,16 +15,11 @@ namespace LocalizationManagerTool
     public partial class MainWindow : Window
     {
         public List<string> Columns = new List<string>();
-        ObservableCollection<Row> row = new ObservableCollection<Row>();
+        ObservableCollection<Row> rows = new ObservableCollection<Row>();
 
         public class Row : INotifyPropertyChanged
         {
-            //public Row(int size)
-            //{
-            //    items = new string[size];
-            //}
-
-            //private string[] items;
+           
             private string id = string.Empty;
             private string en = string.Empty;
             private string fr = string.Empty;
@@ -88,7 +83,7 @@ namespace LocalizationManagerTool
         {
             InitializeComponent();
 
-            dataGrid.ItemsSource = row;
+            dataGrid.ItemsSource = rows;
 
             Row test = new Row();
             test.Id = "test";
@@ -134,7 +129,7 @@ namespace LocalizationManagerTool
             List<Row> xmlFile = ImportFromXML(filename);
             foreach (Row xmlRow in xmlFile)
             {
-                row.Add(xmlRow);
+                rows.Add(xmlRow);
             }
         }
 
@@ -143,7 +138,7 @@ namespace LocalizationManagerTool
             List<Row> xmlFile = ImportFromJSON(filename);
             foreach (Row xmlRow in xmlFile)
             {
-                row.Add(xmlRow);
+                rows.Add(xmlRow);
             }
         }
 
@@ -152,7 +147,7 @@ namespace LocalizationManagerTool
             List<Row> xmlFile = ImportFromCSV(filename);
             foreach (Row xmlRow in xmlFile)
             {
-                row.Add(xmlRow);
+                rows.Add(xmlRow);
             }
         }
 
@@ -163,7 +158,7 @@ namespace LocalizationManagerTool
             if (result == true)
             {
                 string folderName = dialog.FolderName + "/test.csv";
-                ExportToCSV(row.ToList(), folderName);
+                ExportToCSV(rows.ToList(), folderName);
             }
         }
     }
