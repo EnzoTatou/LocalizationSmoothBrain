@@ -91,7 +91,7 @@ namespace LocalizationManagerTool
             test.Fr = "fr";
             test.Es = "es";
             test.Ja = "ja";
-
+            rows.Add(test);
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
