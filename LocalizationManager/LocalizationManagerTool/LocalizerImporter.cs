@@ -27,7 +27,7 @@ public static class LocalizerManager
     {
         using (var reader = new StreamReader(filePath))
         {
-            string[]? headers = reader.ReadLine()?.Split(',');
+            string[]? headers = reader.ReadLine()?.Split(';');
             if (headers == null) throw new Exception("Invalid CSV file format.");
 
             while (!reader.EndOfStream)
@@ -35,7 +35,7 @@ public static class LocalizerManager
                 var line = reader.ReadLine();
                 if (line == null) continue;
 
-                var values = line.Split(',');
+                var values = line.Split(';');
                 string key = values[0];
 
                 for (int i = 1; i < headers.Length; i++)
@@ -54,14 +54,14 @@ public static class LocalizerManager
     public static void LoadFromJSON(string filePath)
     {
         var jsonData = File.ReadAllText(filePath);
-        localizerDictionaries = JsonSerializer.Deserialize<Dictionary<string, Dictionary<string, string>>>(jsonData) 
+        localizerDictionaries = JsonSerializer.Deserialize<Dictionary<string, Dictionary<string, string>>>(jsonData)
             ?? throw new Exception("couldn't deserialize JSON.");
     }
 
     public static string GetWord(string culture, string key)
     {
-        if(localizerDictionaries.TryGetValue(culture, out var dictionary))
-            if(dictionary.TryGetValue(key, out var word))
+        if (localizerDictionaries.TryGetValue(culture, out var dictionary))
+            if (dictionary.TryGetValue(key, out var word))
                 return word;
 
         throw new Exception("culture or key is not valid.");
