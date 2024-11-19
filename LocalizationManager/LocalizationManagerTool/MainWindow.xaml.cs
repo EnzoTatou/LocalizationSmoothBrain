@@ -6,6 +6,8 @@ using System.Data.Common;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Input;
+using System.Windows.Media;
 
 namespace LocalizationManagerTool
 {
@@ -19,7 +21,35 @@ namespace LocalizationManagerTool
 
         public class Row : INotifyPropertyChanged
         {
+            private Dictionary<string, string> languages = new Dictionary<string, string>();
+            public Dictionary<string, string> Languages
+            {
+                get { return languages; }
+                set { languages = value; OnPropertyChanged(nameof(Languages)); }
+            }
+            public Row()
+            {
+                languages.Add("id", string.Empty);
+                languages.Add("en", string.Empty);
+                languages.Add("fr", string.Empty);
+                languages.Add("es", string.Empty);
+                languages.Add("ja", string.Empty);
+            }
 
+            public string this[string key]
+            {
+                get
+                {
+                    if (!languages.TryGetValue(key, out var value)) throw new Exception($"can't find {key}");
+                    return value;
+                }
+                set
+                {
+                    if(languages.ContainsKey(key)) languages[key] = value;
+                    else languages.Add(key, value);
+                    OnPropertyChanged(nameof(Languages));
+                }
+            }
             private string id = string.Empty;
             private string en = string.Empty;
             private string fr = string.Empty;
@@ -186,16 +216,54 @@ namespace LocalizationManagerTool
 
         private void GenerateColumns()
         {
-            foreach (var field in typeof(Row).GetFields(System.Reflection.BindingFlags.NonPublic
-                | System.Reflection.BindingFlags.Instance))
+            Row tempRow = new Row();
+            var langages = typeof(Row).GetProperty("Languages")?.GetValue(tempRow) as Dictionary<string, string>;
+            if (langages == null) return;
+
+            foreach(var test in langages)
             {
-                if(field.FieldType != typeof(PropertyChangedEventHandler))
+                MessageBox.Show(test.Key);
                 dataGrid.Columns.Add(new DataGridTextColumn
                 {
-                    Header = field.Name,
-                    Binding = new System.Windows.Data.Binding(field.Name)
+                    Header = test.Key,
+                    Binding = new Binding($"[{test.Key}]") // Utilise la propriété publique comme chemin
                 });
             }
+            foreach (var property in typeof(Row).GetProperties(System.Reflection.BindingFlags.Public
+                                                                | System.Reflection.BindingFlags.Instance))
+            {
+               
+            }
+
+            var actionColumn = new DataGridTemplateColumn
+            {
+                Header = "Actions",
+                CellTemplate = new DataTemplate
+                {
+                    VisualTree = CreateButton()
+                }
+            };
+
+
+
+            // Ajouter la colonne à la fin
+            dataGrid.Columns.Add(actionColumn);
         }
+
+        private FrameworkElementFactory CreateButton()
+        {
+            var button = new FrameworkElementFactory(typeof(Button));
+            button.SetValue(Button.ContentProperty, "Supprimer");
+            button.SetValue(Button.BackgroundProperty, new SolidColorBrush(Colors.Red));
+            button.SetValue(Button.ForegroundProperty, new SolidColorBrush(Colors.White));
+            button.AddHandler(Button.ClickEvent, new RoutedEventHandler(DeleteRow_Click));
+
+            // Liez le Tag du bouton à la ligne correspondante
+            button.SetBinding(Button.TagProperty, new Binding());
+
+            return button;
+        }
+
     }
+
 }

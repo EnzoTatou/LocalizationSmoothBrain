@@ -27,7 +27,7 @@ namespace LocalizationManagerTool
                         var values = line.Split(';');
                         Row row = new Row();
                         Type rowType = typeof(Row);
-                        for (int i = 0; i < values.Length; i++)
+                        for (int i = 0; i < values.Length - 1; i++)
                         {
                             rowType.GetFields(BindingFlags.NonPublic | BindingFlags.Instance)[i].SetValue(row, values[i]);
                         }
