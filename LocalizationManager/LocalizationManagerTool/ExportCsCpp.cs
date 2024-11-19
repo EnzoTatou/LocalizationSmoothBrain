@@ -75,15 +75,27 @@ namespace LocalizationManagerTool
                     if (i != languages.Count - 1)
                     {
                         toAdd += ",";
+                        toAdd += "\n\n";
                     }
-                    toAdd += "\n\n";
                 }
 
-                toAdd += "\n\t }";
+                toAdd += "\n }";
 
                 result = result.Insert(id, toAdd);
 
                 using (var writer = new StreamWriter(filePath))
+                {
+                    writer.Write(result);
+                }
+            }
+
+            using (var reader = new StreamReader(@"..\..\..\..\CPPModel.cpp"))
+            {
+                string? result = reader.ReadToEnd();
+                string? folderPath = System.IO.Path.GetDirectoryName(filePath);
+                string cppFilePath = (folderPath is not null) ? folderPath + "/test.cpp" : throw new Exception("no folder");
+
+                using (var writer = new StreamWriter(cppFilePath))
                 {
                     writer.Write(result);
                 }
