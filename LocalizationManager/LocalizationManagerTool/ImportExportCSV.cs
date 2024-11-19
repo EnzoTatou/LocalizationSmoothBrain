@@ -38,13 +38,21 @@ namespace LocalizationManagerTool
 
             return content;
         }
-        
+
         public void ExportToCSV(DataGrid dataGrid, string filePath)
         {
             var items = dataGrid.ItemsSource?.Cast<Row>().ToList();
 
+            List<string> headers = new();
+            foreach (var property in typeof(Row).GetProperties(BindingFlags.Public | BindingFlags.Instance))
+            {
+                headers.Add(property.Name);
+            }
+
             using (var writer = new StreamWriter(filePath, false))
             {
+                writer.WriteLine(string.Join(";", headers));
+
                 foreach (Row item in items)
                 {
                     var values = dataGrid.Columns.Select(col =>
