@@ -94,35 +94,7 @@ namespace LocalizationManagerTool
             rows.Add(test);
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            //MessageBox.Show("Clicked");
-            var dialog = new OpenFileDialog();
-            dialog.FileName = "Import file";
-            dialog.Filter = "CSV|*.csv|XML|*.xml|JSON|*.json";
-            bool? result = dialog.ShowDialog();
-            if (result == true)
-            {
-                string filename = dialog.FileName;
-                string extension = System.IO.Path.GetExtension(filename);
-                MessageBox.Show(extension);
-                switch (extension)
-                {
-                    case ".xml":
-                        ImportXML(filename);
-                        MessageBox.Show("XML imported");
-                        break;
-                    case ".json":
-                        ImportJSON(filename);
-                        MessageBox.Show("JSON imported");
-                        break;
-                    case ".csv":
-                        ImportCSV(filename);
-                        MessageBox.Show("CSV imported");
-                        break;
-                }
-            }
-        }
+        
 
         private void ImportXML(string filename)
         {
@@ -153,13 +125,67 @@ namespace LocalizationManagerTool
 
         private void Button_Export(object sender, RoutedEventArgs e)
         {
-            var dialog = new OpenFolderDialog();
+            var dialog = new SaveFileDialog();
+            dialog.FileName = "Export file";
+            dialog.Filter = "CSV|*.csv|XML|*.xml|JSON|*.json";
             bool? result = dialog.ShowDialog();
             if (result == true)
             {
                 string folderName = dialog.FolderName + "/test.csv";
                 ExportToCSV(dataGrid, folderName);
+                string filename = dialog.FileName;
+                string extension = System.IO.Path.GetExtension(filename);
+                MessageBox.Show(extension);
+                switch (extension)
+                {
+                    case ".xml":
+                        ExportToJSON(dataGrid, filename);
+                        MessageBox.Show("XML exported");
+                        break;
+                    case ".json":
+                        ExportToJSON(dataGrid, filename);
+                        MessageBox.Show("JSON exported to " + filename);
+                        break;
+                    case ".csv":
+                        //ExportToCSV(filename);
+                        MessageBox.Show("CSV exported");
+                        break;
+                }
             }
+        }
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            //MessageBox.Show("Clicked");
+            var dialog = new OpenFileDialog();
+            dialog.FileName = "Import file";
+            dialog.Filter = "CSV|*.csv|XML|*.xml|JSON|*.json";
+            bool? result = dialog.ShowDialog();
+            if (result == true)
+            {
+                string filename = dialog.FileName;
+                string extension = System.IO.Path.GetExtension(filename);
+                MessageBox.Show(extension);
+                switch (extension)
+                {
+                    case ".xml":
+                        ImportXML(filename);
+                        MessageBox.Show("XML imported");
+                        break;
+                    case ".json":
+                        ImportJSON(filename);
+                        MessageBox.Show("JSON imported");
+                        break;
+                    case ".csv":
+                        ImportCSV(filename);
+                        MessageBox.Show("CSV imported");
+                        break;
+                }
+            }
+        }
+        private void Button_Click_Remove(object sender, RoutedEventArgs e)
+        {
+            if(rows.Count > 0)
+                rows.RemoveAt(rows.Count - 1);
         }
     }
 }
