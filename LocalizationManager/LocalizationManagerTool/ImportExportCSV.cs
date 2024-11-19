@@ -40,9 +40,11 @@ namespace LocalizationManagerTool
             var items = dataGrid.ItemsSource?.Cast<Row>().ToList();
 
             List<string> headers = new();
-            foreach (var property in typeof(Row).GetProperties(BindingFlags.Public | BindingFlags.Instance))
+            foreach (var column in dataGrid.Columns)
             {
-                headers.Add(property.Name);
+                if (column.Header == null) continue;
+                string? header = column.Header.ToString();
+                if(header != null) headers.Add(header);
             }
 
             using (var writer = new StreamWriter(filePath, false))

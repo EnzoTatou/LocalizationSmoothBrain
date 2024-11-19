@@ -85,8 +85,22 @@ namespace LocalizationManagerTool
         private void ImportJSON(string filename)
         {
             List<Row> xmlFile = ImportFromJSON(filename);
+            List<string> headers = new List<string>();
+            foreach(var columns in dataGrid.Columns)
+            {
+                if (columns.Header == null) continue;
+                string? header = columns.Header.ToString();
+                if(header != null) headers.Add(header);
+            }
             foreach (Row xmlRow in xmlFile)
             {
+                foreach(var str in xmlRow.Languages.Keys)
+                {
+                    if(!headers.Contains(str))
+                    {
+                        AddColumn(str);
+                    }
+                }
                 rows.Add(xmlRow);
             }
         }
@@ -234,6 +248,18 @@ namespace LocalizationManagerTool
                 {
                     Header = columnWindow.language,
                     Binding = new Binding($"[{columnWindow.language}]") // Utilise la propriété publique comme chemin
+                });
+            }
+        }
+
+        private void AddColumn(string columnName)
+        {
+            if (columnName != null)
+            {
+                dataGrid.Columns.Insert(dataGrid.Columns.Count - 1, new DataGridTextColumn
+                {
+                    Header = columnName,
+                    Binding = new Binding($"[{columnName}]") // Utilise la propriété publique comme chemin
                 });
             }
         }
