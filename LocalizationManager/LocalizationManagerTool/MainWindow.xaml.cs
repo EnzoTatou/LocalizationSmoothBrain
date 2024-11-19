@@ -130,7 +130,7 @@ namespace LocalizationManagerTool
                 switch (extension)
                 {
                     case ".xml":
-                        ExportToJSON(dataGrid, filename);
+                        ExportToXML(dataGrid, filename);
                         MessageBox.Show("XML exported");
                         break;
                     case ".json":
