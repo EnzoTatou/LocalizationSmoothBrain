@@ -11,7 +11,8 @@
             <Button Content="Import" Click="Button_Click"/>
             <Button Content="Export" Click="Button_Export"/>
         </Menu>
-        <DataGrid Name="dataGrid" d:ItemsSource="{d:SampleData ItemCount=5}" Margin="0,22,0,0"/>
+        <DataGrid Name="dataGrid" d:ItemsSource="{d:SampleData ItemCount=5}" Margin="0,22,0,0" />
+        <Button Content="-" HorizontalAlignment="Left" Margin="5,0,0,-33" VerticalAlignment="Bottom" Width="58" Background="#FFF11616" FontSize="15" Click="Button_Click_Remove"/>
 
     </Grid>
 </Window>
