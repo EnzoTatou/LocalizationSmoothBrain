@@ -24,7 +24,7 @@ namespace LocalizationManagerTool
 
                     if (line != null)
                     {
-                        var values = line.Split(',');
+                        var values = line.Split(';');
                         Row row = new Row();
                         Type rowType = typeof(Row);
                         for (int i = 0; i < values.Length; i++)

@@ -6,13 +6,24 @@
         xmlns:local="clr-namespace:LocalizationManagerTool"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
-    <Grid VerticalAlignment="Top" Margin="0,0,0,-1">
+    <Grid VerticalAlignment="Top" Margin="0,0,0,0">
         <Menu VerticalAlignment="Top" Height="22">
             <Button Content="Import" Click="Button_Click"/>
             <Button Content="Export" Click="Button_Export"/>
         </Menu>
-        <DataGrid Name="dataGrid" d:ItemsSource="{d:SampleData ItemCount=5}" Margin="0,22,0,0" />
-        <Button Content="-" HorizontalAlignment="Left" Margin="5,0,0,-33" VerticalAlignment="Bottom" Width="58" Background="#FFF11616" FontSize="15" Click="Button_Click_Remove"/>
+        <DataGrid Name="dataGrid" d:ItemsSource="{d:SampleData ItemCount=1}" Margin="0,22,0,0" AutoGenerateColumns="False">
+            <DataGrid.Columns>
+                <DataGridTemplateColumn Width="15">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Width="15" Height="15" Margin="0,0,0,0" Background="Red">
+                                <Button Content="x" Click="DeleteRow_Click" Tag="{Binding}" Background="#FFF11616" Foreground="White" Width="16" Height="63" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Button>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
 
     </Grid>
 </Window>
