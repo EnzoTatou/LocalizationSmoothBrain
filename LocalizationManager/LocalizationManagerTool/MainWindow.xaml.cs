@@ -8,6 +8,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace LocalizationManagerTool
 {
@@ -40,67 +41,20 @@ namespace LocalizationManagerTool
             {
                 get
                 {
-                    if (!languages.TryGetValue(key, out var value)) throw new Exception($"can't find {key}");
-                    return value;
+                    if (!languages.TryGetValue(key, out var value))
+                    {
+                        languages.Add(key, string.Empty);
+                    }
+                    return languages[key];
                 }
                 set
                 {
-                    if(languages.ContainsKey(key)) languages[key] = value;
+                    if (languages.ContainsKey(key)) languages[key] = value;
                     else languages.Add(key, value);
                     OnPropertyChanged(nameof(Languages));
                 }
             }
-            private string id = string.Empty;
-            private string en = string.Empty;
-            private string fr = string.Empty;
-            private string es = string.Empty;
-            private string ja = string.Empty;
-            public string Id
-            {
-                get { return id; }
-                set
-                {
-                    id = value;
-                    OnPropertyChanged(id);
-                }
-            }
-            public string En
-            {
-                get { return en; }
-                set
-                {
-                    en = value;
-                    OnPropertyChanged(en);
-                }
-            }
-            public string Fr
-            {
-                get { return fr; }
-                set
-                {
-                    fr = value;
-                    OnPropertyChanged(fr);
-                }
-            }
-            public string Es
-            {
-                get { return es; }
-                set
-                {
-                    es = value;
-                    OnPropertyChanged(es);
-                }
-            }
-            public string Ja
-            {
-                get { return ja; }
-                set
-                {
-                    ja = value;
-                    OnPropertyChanged(ja);
-                }
-            }
-
+           
             public event PropertyChangedEventHandler? PropertyChanged;
 
             protected void OnPropertyChanged(string propertyName)
@@ -150,7 +104,7 @@ namespace LocalizationManagerTool
         {
             var dialog = new SaveFileDialog();
             dialog.FileName = "Export file";
-            dialog.Filter = "CSV|*.csv|XML|*.xml|JSON|*.json";
+            dialog.Filter = "CSV|*.csv|XML|*.xml|JSON|*.json|CS|*.cs|CPP|*.h";
             bool? result = dialog.ShowDialog();
             if (result == true)
             {
@@ -171,6 +125,14 @@ namespace LocalizationManagerTool
                         break;
                     case ".csv":
                         ExportToCSV(dataGrid, filename);
+                        MessageBox.Show("CSV exported");
+                        break;
+                    case ".cs":
+                        ExportCS(dataGrid, filename);
+                        MessageBox.Show("CSV exported");
+                        break;
+                    case ".h":
+                        ExportCPP(dataGrid, filename);
                         MessageBox.Show("CSV exported");
                         break;
                 }
@@ -220,31 +182,22 @@ namespace LocalizationManagerTool
             var langages = typeof(Row).GetProperty("Languages")?.GetValue(tempRow) as Dictionary<string, string>;
             if (langages == null) return;
 
-            foreach(var test in langages)
+            foreach (var test in langages)
             {
-                MessageBox.Show(test.Key);
                 dataGrid.Columns.Add(new DataGridTextColumn
                 {
                     Header = test.Key,
                     Binding = new Binding($"[{test.Key}]") // Utilise la propriété publique comme chemin
                 });
             }
-            foreach (var property in typeof(Row).GetProperties(System.Reflection.BindingFlags.Public
-                                                                | System.Reflection.BindingFlags.Instance))
-            {
-               
-            }
 
             var actionColumn = new DataGridTemplateColumn
             {
-                Header = "Actions",
                 CellTemplate = new DataTemplate
                 {
                     VisualTree = CreateButton()
                 }
             };
-
-
 
             // Ajouter la colonne à la fin
             dataGrid.Columns.Add(actionColumn);
@@ -264,6 +217,26 @@ namespace LocalizationManagerTool
             return button;
         }
 
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            var window = new AddColumnWindow();
+
+            window.Show();
+            window.Closing += AddColumn;
+        }
+
+        private void AddColumn(object? sender, CancelEventArgs e)
+        {
+            AddColumnWindow? columnWindow = sender as AddColumnWindow;
+            if (columnWindow != null)
+            {
+                dataGrid.Columns.Insert(dataGrid.Columns.Count - 1,new DataGridTextColumn
+                {
+                    Header = columnWindow.language,
+                    Binding = new Binding($"[{columnWindow.language}]") // Utilise la propriété publique comme chemin
+                });
+            }
+        }
     }
 
 }

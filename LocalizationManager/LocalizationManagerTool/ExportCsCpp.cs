@@ -1,7 +1,4 @@
-﻿using System.Diagnostics;
-using System.IO;
-using System.Reflection;
-using System.Windows;
+﻿using System.IO;
 using System.Windows.Controls;
 
 namespace LocalizationManagerTool
@@ -13,17 +10,17 @@ namespace LocalizationManagerTool
             using (var reader = new StreamReader(@"..\..\..\..\CSModel.cs"))
             {
                 string? result = reader.ReadToEnd();
-                int id = result.IndexOfAny("/**/".ToCharArray()); 
+                int id = result.IndexOfAny("/**/".ToCharArray());
                 string toAdd = string.Empty;
-                List<FieldInfo> languages = GetLanguages();
+                List<string> languages = GetLanguages();
 
                 for (int i = 0; i < languages.Count; i++)
                 {
-                    toAdd += "\t\t{ \"" + languages[i].Name + "\",new Dictionary<string, string>()";
+                    toAdd += "\t\t{ \"" + languages[i] + "\",new Dictionary<string, string>()";
                     foreach (var item in rows)
                     {
-                        toAdd += "\n\t\t\t{ \"" + item.Id + "\", \"" + languages[i].GetValue(item) + "\" }";
-                        if(rows.IndexOf(item) != rows.Count -1)
+                        toAdd += "\n\t\t\t{ \"" + item["id"] + "\", \"" + item[languages[i]] + "\" }";
+                        if (rows.IndexOf(item) != rows.Count - 1)
                         {
                             toAdd += ",";
                         }
@@ -31,7 +28,7 @@ namespace LocalizationManagerTool
 
                     toAdd += "\n\t\t}";
 
-                    if (i != languages.Count -1)
+                    if (i != languages.Count - 1)
                     {
                         toAdd += ",";
                     }
@@ -56,14 +53,14 @@ namespace LocalizationManagerTool
                 string? result = reader.ReadToEnd();
                 int id = result.IndexOfAny("/**/".ToCharArray());
                 string toAdd = string.Empty;
-                List<FieldInfo> languages = GetLanguages();
+                List<string> languages = GetLanguages();
 
                 for (int i = 0; i < languages.Count; i++)
                 {
-                    toAdd += "\t\t{ \"" + languages[i].Name + "\", {";
+                    toAdd += "\t\t{ \"" + languages[i] + "\", {";
                     foreach (var item in rows)
                     {
-                        toAdd += "\n\t\t\t{ \"" + item.Id + "\", \"" + languages[i].GetValue(item) + "\" }";
+                        toAdd += "\n\t\t\t{ \"" + item["id"] + "\", \"" + item[languages[i]] + "\" }";
                         if (rows.IndexOf(item) != rows.Count - 1)
                         {
                             toAdd += ",";
@@ -102,18 +99,19 @@ namespace LocalizationManagerTool
             }
         }
 
-        public List<FieldInfo> GetLanguages()
+        public List<string> GetLanguages()
         {
-            Type rowType = typeof(Row);
-            List<FieldInfo> list = new List<FieldInfo>();
-            foreach (var field in rowType.GetFields(BindingFlags.NonPublic | BindingFlags.Instance))
+            List<string> list = new List<string>();
+            foreach (var column in dataGrid.Columns)
             {
-                //MessageBox.Show(field.FieldType.ToString());
-                if (field.FieldType == typeof(string) && field.Name != "id")
+                if (column.Header == null || column.Header.ToString() == "id") continue;
+                string? header = column.Header.ToString();
+                if (header != null)
                 {
-                    list.Add(field);
+                    list.Add(header);
                 }
             }
+           
             return list;
         }
 

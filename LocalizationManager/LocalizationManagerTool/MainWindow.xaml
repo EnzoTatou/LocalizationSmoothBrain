@@ -10,6 +10,7 @@
         <Menu VerticalAlignment="Top" Height="22">
             <Button Content="Import" Click="Button_Click"/>
             <Button Content="Export" Click="Button_Export"/>
+            <Button Content="Add Columns" Click="Button_Click_1"/>
         </Menu>
         <DataGrid Name="dataGrid" d:ItemsSource="{d:SampleData ItemCount=1}" Margin="0,22,0,0" AutoGenerateColumns="False">
             
