@@ -19,7 +19,7 @@ namespace LocalizationManagerTool
 
         public class Row : INotifyPropertyChanged
         {
-           
+
             private string id = string.Empty;
             private string en = string.Empty;
             private string fr = string.Empty;
@@ -82,19 +82,12 @@ namespace LocalizationManagerTool
         public MainWindow()
         {
             InitializeComponent();
-
             dataGrid.ItemsSource = rows;
 
-            Row test = new Row();
-            test.Id = "test";
-            test.En = "en";
-            test.Fr = "fr";
-            test.Es = "es";
-            test.Ja = "ja";
-            rows.Add(test);
+            GenerateColumns();
         }
 
-        
+
 
         private void ImportXML(string filename)
         {
@@ -131,8 +124,8 @@ namespace LocalizationManagerTool
             bool? result = dialog.ShowDialog();
             if (result == true)
             {
-                string folderName = dialog.FolderName + "/test.csv";
-                ExportToCSV(dataGrid, folderName);
+                string folderName = dialog.FileName;
+
                 string filename = dialog.FileName;
                 string extension = System.IO.Path.GetExtension(filename);
                 MessageBox.Show(extension);
@@ -147,7 +140,7 @@ namespace LocalizationManagerTool
                         MessageBox.Show("JSON exported to " + filename);
                         break;
                     case ".csv":
-                        //ExportToCSV(filename);
+                        ExportToCSV(dataGrid, filename);
                         MessageBox.Show("CSV exported");
                         break;
                 }
@@ -164,7 +157,6 @@ namespace LocalizationManagerTool
             {
                 string filename = dialog.FileName;
                 string extension = System.IO.Path.GetExtension(filename);
-                MessageBox.Show(extension);
                 switch (extension)
                 {
                     case ".xml":
@@ -182,10 +174,28 @@ namespace LocalizationManagerTool
                 }
             }
         }
-        private void Button_Click_Remove(object sender, RoutedEventArgs e)
+        private void DeleteRow_Click(object sender, RoutedEventArgs e)
         {
-            if(rows.Count > 0)
-                rows.RemoveAt(rows.Count - 1);
+            if (sender == null) return;
+            Button? button = sender as Button;
+            Row? row = button?.Tag as Row;
+
+            if (row == null) return;
+            rows.Remove(row);
+        }
+
+        private void GenerateColumns()
+        {
+            foreach (var field in typeof(Row).GetFields(System.Reflection.BindingFlags.NonPublic
+                | System.Reflection.BindingFlags.Instance))
+            {
+                if(field.FieldType != typeof(PropertyChangedEventHandler))
+                dataGrid.Columns.Add(new DataGridTextColumn
+                {
+                    Header = field.Name,
+                    Binding = new System.Windows.Data.Binding(field.Name)
+                });
+            }
         }
     }
 }
