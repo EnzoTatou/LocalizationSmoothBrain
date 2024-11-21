@@ -18,38 +18,74 @@ namespace LocalizationManagerTool
     {
         public List<Row> ImportFromXML(string filePath)
         {
-            var serializer = new XmlSerializer(typeof(List<Row>));
-            using (var reader = new StreamReader(filePath))
-            {
-                if (serializer != null)
-                {
-                    object? deserializedContent = serializer.Deserialize(reader);
-
-                    if (deserializedContent != null)
-                    {
-                        return (List<Row>)deserializedContent;
-                    }
-                }
-            }
-
             var xDocument = XDocument.Load(filePath);
 
-            foreach (var languageElement in xDocument.Root.Elements())
-            {
-                string language = languageElement.Name.LocalName;
-                MessageBox.Show(language);
-                //if (!localizerDictionaries.ContainsKey(language))
-                //{
-                //    localizerDictionaries[language] = new Dictionary<string, string>();
-                //}
+            // Extract languages and values
+            var languages = xDocument.Root.Elements()
+                .Select(lang => new
+                {
+                    LangCode = lang.Name.NamespaceName, // Get the namespace as the language code
+                    Entries = lang.Elements("Id")
+                        .Zip(lang.Elements("Value"), (id, value) => new { Id = id.Value, Value = value.Value })
+                }).ToList();
 
-                //foreach (var entryElement in languageElement.Elements())
-                //{
-                //    string key = entryElement.Name.LocalName;
-                //    string value = entryElement.Value;
-                //    localizerDictionaries[language][key] = value;
-                //}
+            foreach (var lang in languages) 
+            {
+                MessageBox.Show(lang.Entries.First().Value);
             }
+
+            // Create a list of rows
+            var rows = new List<Row>();
+
+            // Create the header row
+            var header = new Row();
+            header.Languages["id"] = "id";
+            foreach (var language in languages)
+            {
+                header.Languages[language.LangCode] = language.LangCode;
+            }
+            rows.Add(header);
+
+            // Create the data rows
+            var ids = languages.First().Entries.Select(e => e.Id).Distinct();
+
+            foreach (var id in ids)
+            {
+                var row = new Row();
+                row.Languages["id"] = id;
+                foreach (var language in languages)
+                {
+                    var value = language.Entries.FirstOrDefault(e => e.Id == id)?.Value ?? "";
+                    MessageBox.Show(value);
+                    row.Languages[language.LangCode] = value;
+                }
+                rows.Add(row);
+            }
+
+            return rows;
+
+
+            //List<XElement> ids = xDocument.Root.Descendants().Where(element => element.Name.LocalName == "Id").ToList();
+            //List<string> languages = new List<string>();
+            //List<XElement> values = xDocument.Root.Descendants().Where(element => element.Name.LocalName == "Value").ToList();
+            //List<XElement> languageElements = xDocument.Root.Elements().ToList();
+
+            //foreach (var languageElement in languageElements)
+            //{
+            //    languages.Add(languageElement.Name.NamespaceName);
+            //}
+
+            //for(int i = 0; i < ids.Count; i++)
+            //{
+            //    Row row = new Row();
+            //    int k = 0;
+            //    for(int j = 0; j < languages.Count; j++)
+            //    {
+            //        if()
+            //        row.Languages.Add(languages[j], )
+            //    }
+            //}
+
 
             throw new System.Exception("haha dunkan tu t'es fait avoir");
         }
@@ -58,9 +94,9 @@ namespace LocalizationManagerTool
         {
             Dictionary<string, Dictionary<string, string>> localizerDictionaries = new();
 
-            foreach(string language in GetLanguages())
+            foreach (string language in GetLanguages())
             {
-                localizerDictionaries.Add(language,new Dictionary<string, string>());
+                localizerDictionaries.Add(language, new Dictionary<string, string>());
             }
 
             foreach (var row in rows)
@@ -83,7 +119,7 @@ namespace LocalizationManagerTool
                 {
                     writer.WriteStartElement("Language", language);
 
-                    foreach(var idValuePair in localizerDictionaries[language])
+                    foreach (var idValuePair in localizerDictionaries[language])
                     {
                         writer.WriteElementString("Id", idValuePair.Key);
                         writer.WriteElementString("Value", idValuePair.Value);
