@@ -3,6 +3,7 @@ using System.IO;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Shapes;
 
 namespace LocalizationManagerTool
 {
@@ -12,28 +13,18 @@ namespace LocalizationManagerTool
         {
             List<Row> content = new();
 
-            int it = 0;
-            List<string> headers = new();
-            int nbOfFields = 0;
-
             using (var reader = new StreamReader(_path))
             {
+                List<string>? headers = reader.ReadLine()?.Split(';').ToList();
+                if (headers == null) throw new Exception("Invalid CSV file format.");
+
+                int nbOfFields = headers.Count;
+
                 while (!reader.EndOfStream)
                 {
-                    it++;
                     var line = reader.ReadLine();
                     if (line == null) continue;
 
-                    // headers
-                    if (it <= 1)
-                    {
-                        headers = line.Split(';').ToList();
-                        nbOfFields = headers.Count;
-
-                        continue;
-                    }
-
-                    // rows
                     Row row = new Row();
 
                     List<string> values = line.Split(';').ToList();
