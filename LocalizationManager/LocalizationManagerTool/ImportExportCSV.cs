@@ -1,34 +1,49 @@
 ﻿using System.Data;
 using System.IO;
 using System.Reflection;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace LocalizationManagerTool
 {
     public partial class MainWindow
     {
-
         public List<Row> ImportFromCSV(string _path)
         {
             List<Row> content = new();
+
+            int it = 0;
+            List<string> headers = new();
+            int nbOfFields = 0;
 
             using (var reader = new StreamReader(_path))
             {
                 while (!reader.EndOfStream)
                 {
+                    it++;
                     var line = reader.ReadLine();
+                    if (line == null) continue;
 
-                    if (line != null)
+                    // headers
+                    if (it <= 1)
                     {
-                        var values = line.Split(';');
-                        Row row = new Row();
-                        Type rowType = typeof(Row);
-                        for (int i = 0; i < values.Length - 1; i++)
-                        {
-                            rowType.GetFields(BindingFlags.NonPublic | BindingFlags.Instance)[i].SetValue(row, values[i]);
-                        }
-                        content.Add(row);
+                        headers = line.Split(';').ToList();
+                        nbOfFields = headers.Count;
+
+                        continue;
                     }
+
+                    // rows
+                    Row row = new Row();
+
+                    List<string> values = line.Split(';').ToList();
+
+                    for (int i = 0; i < values.Count - 1; i++)
+                    {
+                        row[headers[i]] = values[i];
+                    }
+
+                    content.Add(row);
                 }
             }
 
@@ -44,7 +59,7 @@ namespace LocalizationManagerTool
             {
                 if (column.Header == null) continue;
                 string? header = column.Header.ToString();
-                if(header != null) headers.Add(header);
+                if (header != null) headers.Add(header);
             }
 
             using (var writer = new StreamWriter(filePath, false))
